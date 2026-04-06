@@ -11,6 +11,7 @@
 #include <glm/glm.hpp>
 
 #include "shader.hpp"
+#include "MathUtils.h"
 
 using namespace glm;
 using namespace std;
@@ -64,16 +65,32 @@ inline GLFWwindow *setUp()
 
 int main()
 {
-    GLFWwindow *window;
-    try
-    {
-        window = setUp();
-    }
-    catch (const char *e)
-    {
-        cout << e << endl;
-        throw;
-    }
+    // GLFWwindow *window;
+    // try
+    // {
+    //     window = setUp();
+    // }
+    // catch (const char *e)
+    // {
+    //     cout << e << endl;
+    //     throw;
+    // }
 
     //Add code here
+
+    //testing the vector and matrix classes
+    Vector3 v1(1.0f, 2.0f, 3.0f);
+    Vector3 v2(4.0f, 5.0f, 6.0f);
+    Vector3 v3 = v1.add(v2);
+    Vector3 v4 = v1.cross(v2);
+    float V1_dot_V2 = v1.dot(v2);
+    float V1_length = v1.length();
+    Vector3 v5 = v1.normalize();
+    Vector3 v6 = v1.scale(2);
+    cout << "v1 + v2 = (" << v3.getX() << ", " << v3.getY() << ", " << v3.getZ() << ")" << endl;
+    cout << "v1 * v2 = (" << v4.getX() << ", " << v4.getY() << ", " << v4.getZ() << ")" << endl;
+    cout << V1_dot_V2 << endl;
+    cout << V1_length << endl;
+    cout << "Norm of V1 = (" << v5.getX() << ", " << v5.getY() << ", " << v5.getZ() << ")" << endl;
+    cout << "V1 scaled by 2 = (" << v6.getX() << ", " << v6.getY() << ", " << v6.getZ() << ")" << endl;
 }
