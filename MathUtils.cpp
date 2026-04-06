@@ -22,42 +22,72 @@ void Vector3::setZ(float z) { this->z = z; }
 
 float Vector3::dot(const Vector3& other) const {
     // TODO: return the dot product  x*other.x + y*other.y + z*other.z
-    return 0.0f;
+    Vector3 result;
+    result.setX(x * other.getX());
+    result.setY(y * other.getY());
+    result.setZ(z * other.getZ());
+    return result.getX() + result.getY() + result.getZ();
 }
 
 float Vector3::length() const {
     // TODO: return sqrt(x*x + y*y + z*z)
-    return 0.0f;
+    Vector3 result;
+    result.setX(x * x);
+    result.setY(y * y);
+    result.setZ(z * z);
+    return sqrt(result.getX() + result.getY() + result.getZ());
 }
 
 Vector3 Vector3::normalize() const {
     // TODO: compute len = this->length().
     //       If len is ~0, return Vector3(0,0,0) to avoid division by zero.
     //       Otherwise return Vector3(x/len, y/len, z/len).
-    return Vector3();
+    Vector3 res;
+    float len = this->length();
+    if (len == 0) {
+        return Vector3(0, 0, 0);
+    } else {
+        res.setX(x / len);
+        res.setY(y / len);
+        res.setZ(z / len);
+    }
+    return res;
 }
 
 Vector3 Vector3::cross(const Vector3& other) const {
     // TODO: return the cross product this x other
-    //   result.x = y * other.z - z * other.y
-    //   result.y = z * other.x - x * other.z
-    //   result.z = x * other.y - y * other.x
-    return Vector3();
+    Vector3 res;
+      res.x = y * other.z - z * other.y;
+      res.y = z * other.x - x * other.z;
+      res.z = x * other.y - y * other.x;
+    return res;
 }
 
 Vector3 Vector3::add(const Vector3& other) const {
     // TODO: return Vector3(x + other.x, y + other.y, z + other.z)
-    return Vector3();
+    Vector3 res;
+    res.x = x + other.x;
+    res.y = y + other.y;
+    res.z = z + other.z;
+    return res;
 }
 
 Vector3 Vector3::subtract(const Vector3& other) const {
     // TODO: return Vector3(x - other.x, y - other.y, z - other.z)
-    return Vector3();
+    Vector3 res;
+    res.x = x - other.x;
+    res.y = y - other.y;
+    res.z = z - other.z;
+    return res;
 }
 
 Vector3 Vector3::scale(float s) const {
     // TODO: return Vector3(x * s, y * s, z * s)
-    return Vector3();
+    Vector3 res;
+    res.x = x * s;
+    res.y = y * s;
+    res.z = z * s;
+    return res;
 }
 
 // ===========================================================================
