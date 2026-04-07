@@ -161,17 +161,15 @@ Matrix4 Matrix4::translate(float tx, float ty, float tz) {
 // ---------------------------------------------------------------------------
 Matrix4 Matrix4::scaleMatrix(float sx, float sy, float sz) {
     // TODO: Start from zero matrix, then set:
-    //   m[0][0] = sx
-    //   m[1][1] = sy
-    //   m[2][2] = sz
-    //   m[3][3] = 1
-    //
+    Matrix4 mat = identity();
+    mat.set(0,0,sx);
+    mat.set(1,1,sy);
+    mat.set(2,2,sz);
     //   [ sx  0   0  0 ]
     //   [  0  sy  0  0 ]
     //   [  0  0  sz  0 ]
     //   [  0  0   0  1 ]
-    Matrix4 result;
-    return result;
+    return mat;
 }
 
 // ---------------------------------------------------------------------------
