@@ -117,10 +117,11 @@ void Matrix4::set(int row, int col, float value) {
 //  multiply:  returns this * other
 // ---------------------------------------------------------------------------
 Matrix4 Matrix4::multiply(const Matrix4& other) const {
-    // TODO: Standard 4x4 matrix multiplication.
-    //   result.m[i][j] = sum over k of (this->m[i][k] * other.m[k][j])
-    //   for i in 0..3, j in 0..3, k in 0..3.
     Matrix4 result;
+    for (int i = 0; i < 4; i++)
+        for (int j = 0; j < 4; j++)
+            for (int k = 0; k < 4; k++)
+                result.m[i][j] += m[i][k] * other.m[k][j];
     return result;
 }
 
@@ -177,17 +178,20 @@ Matrix4 Matrix4::scaleMatrix(float sx, float sy, float sz) {
 // ---------------------------------------------------------------------------
 Matrix4 Matrix4::rotateX(float deg) {
     // TODO: Convert deg to radians using toRad(deg).
-    //   float c = cos(rad), s = sin(rad);
-    //   Start from identity, then set:
-    //     m[1][1] =  c;   m[1][2] = -s;
-    //     m[2][1] =  s;   m[2][2] =  c;
-    //
+      float c = cos(toRad(deg)), s = sin(toRad(deg));
+
+    Matrix4 mat = identity();
+
+    mat.set(1,1,c);
+    mat.set(1,2,-(s));
+    mat.set(2,1,s);
+    mat.set(2,2,c);
+
     //   [ 1   0    0   0 ]
     //   [ 0   c   -s   0 ]
     //   [ 0   s    c   0 ]
     //   [ 0   0    0   1 ]
-    Matrix4 result;
-    return result;
+    return mat;
 }
 
 // ---------------------------------------------------------------------------
@@ -195,17 +199,19 @@ Matrix4 Matrix4::rotateX(float deg) {
 // ---------------------------------------------------------------------------
 Matrix4 Matrix4::rotateY(float deg) {
     // TODO: Convert deg to radians.
-    //   float c = cos(rad), s = sin(rad);
-    //   Start from identity, then set:
-    //     m[0][0] =  c;   m[0][2] =  s;
-    //     m[2][0] = -s;   m[2][2] =  c;
-    //
-    //   [  c  0   s  0 ]
-    //   [  0  1   0  0 ]
-    //   [ -s  0   c  0 ]
-    //   [  0  0   0  1 ]
-    Matrix4 result;
-    return result;
+    float c = cos(toRad(deg)), s = sin(toRad(deg));
+
+    Matrix4 mat = identity();
+    mat.set(0,0,c);
+    mat.set(0,2,s);
+    mat.set(2,0,-(s));
+    mat.set(2,2,c);
+    //       0   1  2  3
+    //   0[  c  0   s  0 ]
+    //   1[  0  1   0  0 ]
+    //   2[ -s  0   c  0 ]
+    //   3[  0  0   0  1 ]
+    return mat;
 }
 
 // ---------------------------------------------------------------------------
@@ -213,17 +219,20 @@ Matrix4 Matrix4::rotateY(float deg) {
 // ---------------------------------------------------------------------------
 Matrix4 Matrix4::rotateZ(float deg) {
     // TODO: Convert deg to radians.
-    //   float c = cos(rad), s = sin(rad);
-    //   Start from identity, then set:
-    //     m[0][0] =  c;   m[0][1] = -s;
-    //     m[1][0] =  s;   m[1][1] =  c;
-    //
-    //   [ c  -s   0  0 ]
-    //   [ s   c   0  0 ]
-    //   [ 0   0   1  0 ]
-    //   [ 0   0   0  1 ]
-    Matrix4 result;
-    return result;
+    float c = cos(toRad(deg)), s = sin(toRad(deg));
+
+    Matrix4 mat = identity();
+    mat.set(0,0,c);
+    mat.set(0,1,-(s));
+    mat.set(1,0,s);
+    mat.set(1,1,c);
+
+    //      0   1   2  3
+    //   0[ c  -s   0  0 ]
+    //   1[ s   c   0  0 ]
+    //   2[ 0   0   1  0 ]
+    //   3[ 0   0   0  1 ]
+    return mat;
 }
 
 // ---------------------------------------------------------------------------
@@ -233,22 +242,31 @@ Matrix4 Matrix4::rotateArbitraryAxis(const Vector3& axisDir, float deg) {
     // TODO: Rotation around an arbitrary axis that passes through the origin.
     //
     //   1. Normalize axisDir -> u = (ux, uy, uz).
+    Vector3 u = axisDir.normalize();
     //
     //   2. Compute alignment angles:
     //        theta_x = atan2(uy, uz)
     //          -- This is the angle to rotate the axis into the XZ plane
     //             by rotating around the X axis.
+    float theta_x = atan2(u.getY(), u.getZ());
     //
     //        d = sqrt(uy*uy + uz*uz)
+    float d = sqrt(((u.getY())*(u.getY())) + ((u.getZ())*(u.getZ())));
     //        theta_y = atan2(ux, d)
     //          -- After Rx(theta_x), the axis lies in the XZ plane.
     //             This angle rotates it onto the +Z axis via Ry.
     //          -- NOTE the sign: we need Ry(-theta_y) to bring the axis
     //             FROM its XZ-plane direction ONTO +Z, so theta_y as
     //             computed here will be negated when building the Ry step.
+    float theta_y = atan2(u.getX(), d);
     //
     //   3. Build the decomposition:
     //        R = Rx(-theta_x) * Ry(-theta_y) * Rz(deg) * Ry(theta_y) * Rx(theta_x)
+    float theta_x_deg = theta_x * (180.0f / 3.14159265358979323846f);
+    float theta_y_deg = theta_y * (180.0f / 3.14159265358979323846f);
+    
+    // T(P0) * Rx(-θx) * Ry(+θy) * Rz(θ) * Ry(-θy) * Rx(+θx)
+    Matrix4 R = rotateX(-theta_x_deg).multiply(rotateY(theta_y_deg).multiply(rotateZ(deg).multiply(rotateY(-theta_y_deg).multiply(rotateX(theta_x_deg)))));
     //
     //      Reading right-to-left (the order transformations are applied):
     //        a) Rx(theta_x):     rotate axis into XZ plane
@@ -259,13 +277,7 @@ Matrix4 Matrix4::rotateArbitraryAxis(const Vector3& axisDir, float deg) {
     //
     //   4. Multiply the five matrices together using this->multiply()
     //      (or call the static/member multiply). Return the result.
-    //
-    //   IMPORTANT: Convert theta_x and theta_y to degrees before passing
-    //   them to rotateX / rotateY, since those functions expect degrees.
-    //   Use:  float theta_x_deg = theta_x * (180.0f / 3.14159265358979323846f);
-
-    Matrix4 result;
-    return result;
+    return R;
 }
 
 // ---------------------------------------------------------------------------
@@ -279,31 +291,21 @@ Matrix4 Matrix4::rotateArbitraryAxis(const Vector3& axisPoint,
     //   Full decomposition:
     //     R = T(P0) * Rx(-theta_x) * Ry(-theta_y) * Rz(deg)
     //              * Ry(theta_y) * Rx(theta_x) * T(-P0)
-    //
-    //   Steps:
-    //     1. Build T(-P0) = translate(-P0.x, -P0.y, -P0.z)
-    //     2. Build Rx(theta_x) with theta_x = atan2(uy, uz)  (in degrees)
-    //     3. Build Ry(theta_y) with theta_y = atan2(ux, d)   (in degrees)
-    //        where d = sqrt(uy^2 + uz^2) and u = normalize(axisDir)
-    //     4. Build Rz(deg)
-    //     5. Build Ry(-theta_y)
-    //     6. Build Rx(-theta_x)
-    //     7. Build T(P0) = translate(P0.x, P0.y, P0.z)
-    //
-    //   Multiply all seven matrices right-to-left:
-    //     result = T(P0) * Rx(-theta_x) * Ry(-theta_y) * Rz(deg)
-    //                     * Ry(theta_y) * Rx(theta_x) * T(-P0)
-    //
-    //   Tip: chain the multiplications one at a time:
-    //     Matrix4 temp = Rx_theta_x.multiply(T_neg_P0);
-    //     temp = Ry_theta_y.multiply(temp);
-    //     temp = Rz_deg.multiply(temp);
-    //     temp = Ry_neg_theta_y.multiply(temp);
-    //     temp = Rx_neg_theta_x.multiply(temp);
-    //     result = T_P0.multiply(temp);
+    Vector3 u = axisDir.normalize();
+    float d = sqrt(u.getY() * u.getY() + u.getZ() * u.getZ());
+    float theta_x_deg = atan2(u.getY(), u.getZ()) * (180.0f / 3.14159265358979323846f);
+    float theta_y_deg = atan2(u.getX(), d)         * (180.0f / 3.14159265358979323846f);
 
-    Matrix4 result;
-    return result;
+    Matrix4 T1     = Matrix4::translate(-axisPoint.getX(), -axisPoint.getY(), -axisPoint.getZ());
+    Matrix4 Rx_pos = Matrix4::rotateX( theta_x_deg);
+    Matrix4 Ry_neg = Matrix4::rotateY(-theta_y_deg);
+    Matrix4 Rz_val = Matrix4::rotateZ(deg);
+    Matrix4 Ry_pos = Matrix4::rotateY( theta_y_deg);
+    Matrix4 Rx_neg = Matrix4::rotateX(-theta_x_deg);
+    Matrix4 T2     = Matrix4::translate(axisPoint.getX(), axisPoint.getY(), axisPoint.getZ());
+
+    // T(P0) * Rx(-θx) * Ry(+θy) * Rz(θ) * Ry(-θy) * Rx(+θx) * T(-P0)
+    return T2.multiply(Rx_neg.multiply(Ry_pos.multiply(Rz_val.multiply(Ry_neg.multiply(Rx_pos.multiply(T1))))));
 }
 
 // ---------------------------------------------------------------------------
