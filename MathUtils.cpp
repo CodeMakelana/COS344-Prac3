@@ -129,8 +129,13 @@ Matrix4 Matrix4::multiply(const Matrix4& other) const {
 // ---------------------------------------------------------------------------
 Matrix4 Matrix4::identity() {
     // TODO: Create a Matrix4 and set m[0][0]=m[1][1]=m[2][2]=m[3][3]=1.
-    Matrix4 result;
-    return result;
+    Matrix4 mat;
+    mat.set(0,0,1);
+    mat.set(1,1,1);
+    mat.set(2,2,1);
+    mat.set(3,3,1);
+
+    return mat;
 }
 
 // ---------------------------------------------------------------------------
@@ -138,16 +143,17 @@ Matrix4 Matrix4::identity() {
 // ---------------------------------------------------------------------------
 Matrix4 Matrix4::translate(float tx, float ty, float tz) {
     // TODO: Start from identity, then set:
-    //   m[0][3] = tx
-    //   m[1][3] = ty
-    //   m[2][3] = tz
-    //
+
+    Matrix4 mat = identity();
+      mat.set(0,3,tx);
+      mat.set(1,3,ty);
+      mat.set(2,3,tz);
+    
     //   [ 1  0  0  tx ]
     //   [ 0  1  0  ty ]
     //   [ 0  0  1  tz ]
     //   [ 0  0  0   1 ]
-    Matrix4 result;
-    return result;
+    return mat;
 }
 
 // ---------------------------------------------------------------------------
