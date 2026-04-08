@@ -1,10 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <iostream>
-#include <vector>
-#include <thread>
-#include <random>
-#include <chrono> 
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -51,7 +47,7 @@ inline GLFWwindow *setUp()
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);           // To make MacOS happy; should not be needed
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE); // We don't want the old OpenGL
     GLFWwindow *window;                                            // (In the accompanying source code, this variable is global for simplicity)
-    window = glfwCreateWindow(1000, 1000, "Experiment", NULL, NULL);
+    window = glfwCreateWindow(1000, 1000, "u23588579", NULL, NULL);
     if (window == NULL)
     {
         cout << getError() << endl;
@@ -65,16 +61,16 @@ inline GLFWwindow *setUp()
 
 int main()
 {
-    // GLFWwindow *window;
-    // try
-    // {
-    //     window = setUp();
-    // }
-    // catch (const char *e)
-    // {
-    //     cout << e << endl;
-    //     throw;
-    // }
+    GLFWwindow *window;
+    try
+    {
+        window = setUp();
+    }
+    catch (const char *e)
+    {
+        cout << e << endl;
+        throw;
+    }
 
     //Add code here
 
