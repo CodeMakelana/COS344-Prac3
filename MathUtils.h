@@ -2,7 +2,6 @@
 #define MATHUTILS_H
 
 #include <cmath>
-#include <cstring>
 
 // ---------------------------------------------------------------------------
 // Degrees -> Radians helper
