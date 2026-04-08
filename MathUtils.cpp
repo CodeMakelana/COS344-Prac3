@@ -40,8 +40,6 @@ float Vector3::length() const {
 
 Vector3 Vector3::normalize() const {
     // TODO: compute len = this->length().
-    //       If len is ~0, return Vector3(0,0,0) to avoid division by zero.
-    //       Otherwise return Vector3(x/len, y/len, z/len).
     Vector3 res;
     float len = this->length();
     if (len == 0) {
