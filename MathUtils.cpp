@@ -294,7 +294,7 @@ Matrix4 Matrix4::rotateArbitraryAxis(const Vector3& axisPoint,
     Vector3 u = axisDir.normalize();
     float d = sqrt(u.getY() * u.getY() + u.getZ() * u.getZ());
     float theta_x_deg = atan2(u.getY(), u.getZ()) * (180.0f / 3.14159265358979323846f);
-    float theta_y_deg = atan2(u.getX(), d)         * (180.0f / 3.14159265358979323846f);
+    float theta_y_deg = atan2(u.getX(), d) * (180.0f / 3.14159265358979323846f);
 
     Matrix4 T1     = Matrix4::translate(-axisPoint.getX(), -axisPoint.getY(), -axisPoint.getZ());
     Matrix4 Rx_pos = Matrix4::rotateX( theta_x_deg);
@@ -315,19 +315,22 @@ Matrix4 Matrix4::perspective(float fovDeg, float aspect,
                              float near, float far) {
     // TODO: Symmetric perspective projection matrix.
     //
-    //   float fovRad = toRad(fovDeg);
-    //   float t = tan(fovRad / 2.0f);   // half-angle tangent
-    //
-    //   m[0][0] = 1.0f / (aspect * t);
-    //   m[1][1] = 1.0f / t;
-    //   m[2][2] = -(far + near) / (far - near);
-    //   m[2][3] = -(2.0f * far * near) / (far - near);
-    //   m[3][2] = -1.0f;
-    //   m[3][3] =  0.0f;   (already 0 from default ctor)
-    //
-    //   All other entries remain 0.
-    Matrix4 result;
-    return result;
+    float vert_fov_Rad = toRad(fovDeg);
+    float t = tan(vert_fov_Rad / 2.0f);   // half-angle tangent
+    
+    Matrix4 P;
+    float top = near * t;
+    float right = top * aspect;
+    float bottom = -top;
+    float left = -right;
+
+    P.set(0,0,((2*near) / (right-1)));
+    P.set(1,1,((2*near) / (top-bottom)));
+    P.set(2,2,(-(far - near) / (far - near)));
+    P.set(2,3,(-(2*far*near) / (far - near)));
+    P.set(3,2,-1);
+    
+    return P;
 }
 
 // ---------------------------------------------------------------------------
@@ -339,21 +342,52 @@ Matrix4 Matrix4::lookAt(const Vector3& eye, const Vector3& center,
     //
     //   1. Compute forward direction: f = normalize(center - eye)
     //      (use center.subtract(eye).normalize())
+    Vector3 sub = center.subtract(eye);
+    Vector3 f = sub.normalize(); // Forward directions
     //
     //   2. Compute right direction:   r = normalize(f x up)
     //      (use f.cross(up).normalize())
+    Vector3 cross = f.cross(up);
+    Vector3 r = cross.normalize(); // right direction
     //
     //   3. Compute true up direction: u = r x f
     //      (use r.cross(f))
+    Vector3 u = r.cross(f); //true up direction
     //
     //   4. Build the matrix (row-major):
-    //        [  r.x    r.y    r.z   -r.dot(eye) ]
-    //        [  u.x    u.y    u.z   -u.dot(eye) ]
-    //        [ -f.x   -f.y   -f.z    f.dot(eye) ]
-    //        [   0      0      0        1        ]
+    //             0      1      2         3
+    //        0[  r.x    r.y    r.z   -r.dot(eye) ]
+    //        1[  u.x    u.y    u.z   -u.dot(eye) ]
+    //        2[ -f.x   -f.y   -f.z    f.dot(eye) ]
+    //        3[   0      0      0        1       ]
+
     //
     //   Note: the third row uses -f because OpenGL looks down -Z.
     //   The translation column is the dot of each basis vector with -eye.
-    Matrix4 result;
-    return result;
+    Matrix4 look;
+    //1st row
+    look.set(0,0,r.getX());
+    look.set(0,1,r.getY());
+    look.set(0,2,r.getZ());
+    look.set(0,3,-(r.dot(eye)));
+
+    // 2nd row
+    look.set(1,0,u.getX());
+    look.set(1,1,u.getY());
+    look.set(1,2,u.getZ());
+    look.set(1,3,-(u.dot(eye)));
+
+    //3rd row
+    look.set(2,0,-f.getX());
+    look.set(2,1,-f.getY());
+    look.set(2,2,-f.getZ());
+    look.set(2,3,(f.dot(eye)));
+
+    //4th row
+    look.set(3,0,0);
+    look.set(3,1,0);
+    look.set(3,2,0);
+    look.set(3,3,1);
+
+    return look;
 }
