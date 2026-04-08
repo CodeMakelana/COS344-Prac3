@@ -1,7 +1,7 @@
 #include "MathUtils.h"
 
 // ===========================================================================
-//  Vector3 implementation
+//  Vector3 
 // ===========================================================================
 
 Vector3::Vector3() : x(0.0f), y(0.0f), z(0.0f) {}
@@ -96,7 +96,9 @@ Vector3 Vector3::scale(float s) const {
 
 Matrix4::Matrix4() {
     // Zero-initialise all 16 entries
-    memset(m, 0, sizeof(m));
+    for (int i = 0; i < 4; i++)
+        for (int j = 0; j < 4; j++)
+            m[i][j] = 0.0f;
 }
 
 const float* Matrix4::getData() const {
