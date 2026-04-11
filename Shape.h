@@ -1,40 +1,19 @@
 #ifndef SHAPE_H
 #define SHAPE_H
 
-#include "MathUtils.h"
-#include <GL/glew.h>
 #include <vector>
+#include <GL/glew.h>
 
-class Shape {
-private:
-    std::vector<float>        vertices;  // interleaved: x, y, z, r, g, b
-    std::vector<unsigned int> indices;
-    GLuint VAO, VBO, EBO;
+struct Shape {
+    std::vector<float>        vertices;     // interleaved: x,y,z, r,g,b  (6 floats/vertex)
+    std::vector<unsigned int> indices;      // triangle indices  → GL_TRIANGLES
+    std::vector<unsigned int> wireIndices;  // edge indices      → GL_LINES
 
-public:
-    Shape();
-    ~Shape();
+    GLuint VAO, VBO, EBO, wireEBO;
+    Shape() : VAO(0), VBO(0), EBO(0), wireEBO(0) {}
 
-    // Upload vertex/index data to the GPU and set up VAO/VBO/EBO
-    void init();
-
-    // Draw the shape as filled triangles
-    void draw() const;
-
-    // Draw the shape as a wireframe using GL_LINES
-    void drawWireframe() const;
-
-    // Data setters (call before init())
-    void setVertices(const std::vector<float>& verts);
-    void setIndices(const std::vector<unsigned int>& inds);
-
-    // Data getters
-    const std::vector<float>&        getVertices() const;
-    const std::vector<unsigned int>& getIndices()  const;
-
-    GLuint getVAO() const;
-    GLuint getVBO() const;
-    GLuint getEBO() const;
+    void upload();
+    void draw(bool wireframe);
 };
 
-#endif // SHAPE_H
+#endif
