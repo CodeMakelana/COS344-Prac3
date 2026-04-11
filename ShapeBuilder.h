@@ -2,6 +2,7 @@
 #define SHAPEBUILDER_H
 
 #include "Shape.h"
+#include <cmath>
 
 Shape buildCuboid(float w, float h, float d, float r, float g, float b);
 Shape buildTriangularPrism(float base, float height, float depth, float r, float g, float b);
