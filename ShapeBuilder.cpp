@@ -341,4 +341,5 @@ Shape buildCone(float radius, float height, int segments, float r, float g, floa
         cone.wireIndices.push_back(N+i);
         cone.wireIndices.push_back(i);
     }
+    return cone;
 }

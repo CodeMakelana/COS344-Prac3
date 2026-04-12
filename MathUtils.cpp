@@ -321,9 +321,9 @@ Matrix4 Matrix4::perspective(float fovDeg, float aspect,
     float bottom = -top;
     float left = -right;
 
-    P.set(0,0,((2*near) / (right-1)));
-    P.set(1,1,((2*near) / (top-bottom)));
-    P.set(2,2,(-(far - near) / (far - near)));
+    P.set(0,0,((2*near) / (right - left)));
+    P.set(1,1,((2*near) / (top - bottom)));
+    P.set(2,2,(-(far + near) / (far - near)));
     P.set(2,3,(-(2*far*near) / (far - near)));
     P.set(3,2,-1);
     
